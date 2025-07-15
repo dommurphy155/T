@@ -110,4 +110,9 @@ class TelegramBot:
 
     async def run_polling(self):
         await self.app.run_polling()
- 
+
+
+if __name__ == "__main__":
+    import asyncio
+    bot = TelegramBot()
+    asyncio.run(bot.run_polling())
