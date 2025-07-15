@@ -1,3 +1,4 @@
+
 import asyncio
 import logging
 import nest_asyncio
@@ -10,7 +11,6 @@ async def main():
     await bot.app.initialize()
     await bot.app.start()
     await bot.app.updater.start_polling()
-    # Hold the program open forever until externally stopped (ctrl+c)
     await asyncio.Event().wait()
 
 if __name__ == "__main__":

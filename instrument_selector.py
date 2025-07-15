@@ -1,3 +1,4 @@
+
 import random
 
 CURRENCY_PAIRS = [
