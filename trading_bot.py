@@ -22,14 +22,23 @@ class TradingBot:
         self.instruments = ["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CHF"]
 
     async def run(self):
-        # Try trades on all instruments
+        # Try one trade only
         for instrument in self.instruments:
-            await self._try_trade(instrument)
-        # Monitor and close trades
-        await self.trade_closer.monitor_trades()
+            stop_loss_pips = 10.0
+            units = await self.position_sizer.calculate_units(instrument, stop_loss_pips)
+            if units > 0:
+                success = await self.trade_executor.execute_trade(instrument, units)
+                if success:
+                    # Optional: calculate cost or expected ROI here
+                    await self.trade_closer.monitor_trades()
+                    return {
+                        "instrument": instrument,
+                        "units": units,
+                        "cost_gbp": None,
+                        "expected_roi": 0.12
+                    }
 
-    async def _try_trade(self, instrument):
-        stop_loss_pips = 10.0
-        units = await self.position_sizer.calculate_units(instrument, stop_loss_pips)
-        if units > 0:
-            await self.trade_executor.execute_trade(instrument, units)
+        # Even if no trade made, still monitor trades
+        await self.trade_closer.monitor_trades()
+        return None
+ 
