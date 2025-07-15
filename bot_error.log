@@ -1,0 +1,70 @@
+INFO:position_sizer:Trade state loaded
+INFO:httpx:HTTP Request: POST https://api.telegram.org/bot7874560450:AAH-Bmu1GJTVjwRM7jounms9FFYfC4EbVBQ/getMe "HTTP/1.1 200 OK"
+INFO:telegram.ext.Application:Application started
+INFO:httpx:HTTP Request: POST https://api.telegram.org/bot7874560450:AAH-Bmu1GJTVjwRM7jounms9FFYfC4EbVBQ/deleteWebhook "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api.telegram.org/bot7874560450:AAH-Bmu1GJTVjwRM7jounms9FFYfC4EbVBQ/getUpdates "HTTP/1.1 409 Conflict"
+ERROR:telegram.ext.Updater:Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+ERROR:telegram.ext.Updater:Exception happened while polling for updates.
+Traceback (most recent call last):
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_updater.py", line 607, in _network_loop_retry
+    if not await action_cb():
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_updater.py", line 335, in polling_action_cb
+    raise exc
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_updater.py", line 320, in polling_action_cb
+    updates = await self.bot.get_updates(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_extbot.py", line 543, in get_updates
+    updates = await super().get_updates(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/_bot.py", line 381, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/_bot.py", line 3661, in get_updates
+    await self._post(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/_bot.py", line 469, in _post
+    return await self._do_post(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_extbot.py", line 325, in _do_post
+    return await super()._do_post(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/_bot.py", line 497, in _do_post
+    return await request.post(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/request/_baserequest.py", line 168, in post
+    result = await self._request_wrapper(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/request/_baserequest.py", line 330, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+INFO:httpx:HTTP Request: POST https://api.telegram.org/bot7874560450:AAH-Bmu1GJTVjwRM7jounms9FFYfC4EbVBQ/getUpdates "HTTP/1.1 409 Conflict"
+ERROR:telegram.ext.Updater:Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+ERROR:telegram.ext.Updater:Exception happened while polling for updates.
+Traceback (most recent call last):
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_updater.py", line 607, in _network_loop_retry
+    if not await action_cb():
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_updater.py", line 335, in polling_action_cb
+    raise exc
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_updater.py", line 320, in polling_action_cb
+    updates = await self.bot.get_updates(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_extbot.py", line 543, in get_updates
+    updates = await super().get_updates(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/_bot.py", line 381, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/_bot.py", line 3661, in get_updates
+    await self._post(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/_bot.py", line 469, in _post
+    return await self._do_post(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/ext/_extbot.py", line 325, in _do_post
+    return await super()._do_post(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/_bot.py", line 497, in _do_post
+    return await request.post(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/request/_baserequest.py", line 168, in post
+    result = await self._request_wrapper(
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/telegram/request/_baserequest.py", line 330, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+Traceback (most recent call last):
+  File "/home/ubuntu/this-is-annoying/bot_runner.py", line 18, in <module>
+    asyncio.run(main())
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/nest_asyncio.py", line 30, in run
+    return loop.run_until_complete(task)
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/nest_asyncio.py", line 92, in run_until_complete
+    self._run_once()
+  File "/home/ubuntu/this-is-annoying/venv/lib/python3.10/site-packages/nest_asyncio.py", line 115, in _run_once
+    event_list = self._selector.select(timeout)
+  File "/usr/lib/python3.10/selectors.py", line 469, in select
+    fd_event_list = self._selector.poll(timeout, max_ev)
+KeyboardInterrupt
