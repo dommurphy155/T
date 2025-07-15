@@ -22,9 +22,11 @@ class TradingBot:
         self.instruments = ["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CHF"]
 
     async def run(self):
-        # Try trades on all instruments
+        # Try trades on all instruments, but stop after the first successful trade
         for instrument in self.instruments:
-            await self._try_trade(instrument)
+            trade_placed = await self._try_trade(instrument)
+            if trade_placed:
+                break
         # Monitor and close trades
         await self.trade_closer.monitor_trades()
 
@@ -33,3 +35,5 @@ class TradingBot:
         units = await self.position_sizer.calculate_units(instrument, stop_loss_pips)
         if units > 0:
             await self.trade_executor.execute_trade(instrument, units)
+            return True
+        return False
