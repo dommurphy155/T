@@ -34,10 +34,10 @@ class TelegramBot:
             await update.message.reply_text("⚠️ No trade executed.")
             return
         
-        instrument = getattr(result, "instrument", "unknown")
-        units = getattr(result, "units", 0)
-        cost_in_gbp = getattr(result, "cost_gbp", None)  # Assuming TradingBot returns this
-        expected_roi = getattr(result, "expected_roi", None)  # Decimal e.g. 0.12 for 12%
+        instrument = result.get("instrument", "unknown")
+        units = result.get("units", 0)
+        cost_in_gbp = result.get("cost_gbp", None)
+        expected_roi = result.get("expected_roi", None)
         pl_pct = expected_roi * 100 if expected_roi is not None else None
         
         trade_msg = f"📈 Trade executed on {instrument}\n"
@@ -52,7 +52,6 @@ class TelegramBot:
         await update.message.reply_text(trade_msg)
 
     async def status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        # Removed error summary as requested
         msg = "📊 Status Report:\n✅ All systems up to date and running smoothly."
         await update.message.reply_text(msg)
 
@@ -111,3 +110,9 @@ class TelegramBot:
 
     async def run_polling(self):
         await self.app.run_polling()
+
+
+if __name__ == "__main__":
+    import asyncio
+    bot = TelegramBot()
+    asyncio.run(bot.run_polling())
