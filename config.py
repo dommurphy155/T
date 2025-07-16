@@ -6,6 +6,10 @@ from datetime import datetime
 LOGS_DIR = "logs"
 os.makedirs(LOGS_DIR, exist_ok=True)
 
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
+MAX_COMMANDS_PER_MIN = int(os.environ.get("MAX_COMMANDS_PER_MIN", 10))
+
 
 def setup_logger(name: str):
     logger = logging.getLogger(name)
