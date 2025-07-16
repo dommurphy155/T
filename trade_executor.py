@@ -1,9 +1,10 @@
 from time import time
+from typing import Tuple
 
 from logger import log_trade_action
 from oanda_client import OandaClient
 from position_sizer import calculate_position_size
-from state_manager import get_account_summary, load_state, record_open_trade
+from state_manager import StateManager
 from utils import get_atr_value, get_current_spread, get_signal_hash
 
 MAX_SPREAD_PIPS = 2.0
@@ -14,7 +15,7 @@ MIN_TIME_BETWEEN_TRADES_SEC = 6
 trade_locks = {}
 
 
-async def can_trade(instrument: str, state: dict) -> (bool, str):
+async def can_trade(instrument: str, state: dict) -> Tuple[bool, str]:
     if len(state.get("open_trades", [])) >= MAX_GLOBAL_TRADES:
         return False, "Max global trades reached."
 
@@ -73,9 +74,22 @@ async def execute_trade(
         if not trade_id:
             return "Order failed: No trade ID returned."
 
-        await record_open_trade(trade_id, instrument, direction, size, atr)
+        state_manager = StateManager()
+        state_manager.load_state()
+        open_trades = state_manager.get("open_trades", [])
+        open_trades.append({
+            "trade_id": trade_id,
+            "instrument": instrument,
+            "direction": direction,
+            "size": size,
+            "atr": atr
+        })
+        state_manager.set("open_trades", open_trades)
+        state_manager.save()
+        
         await log_trade_action(
-            f"Executed {direction.upper()} on {instrument} for {size} units (ATR: {atr:.2f})"
+            f"Executed {direction.upper()} on {instrument} for {size} units "
+            f"(ATR: {atr:.2f})"
         )
 
         return f"Trade executed: {instrument} {direction} x{size}"
@@ -87,6 +101,10 @@ async def execute_trade(
 
 # ✅ New for Telegram bot: safe one-off manual trade trigger
 async def execute_single_trade(signal: dict) -> str:
-    state = load_state()
-    account_summary = await get_account_summary()
-    return await execute_trade(signal, account_summary, state)
+    state_manager = StateManager()
+    state_manager.load_state()
+    client = OandaClient()
+    account_summary = client.get_account_summary()
+    return await execute_trade(
+        signal, account_summary, state_manager.get_all()
+    )

@@ -8,6 +8,29 @@ import oandapyV20.endpoints.positions as positions
 import oandapyV20.endpoints.trades as trades
 
 
+# Global client instance for standalone functions
+_client = None
+
+
+def _get_client() -> 'OandaClient':
+    global _client
+    if _client is None:
+        _client = OandaClient()
+    return _client
+
+
+async def get_account_summary() -> Optional[Dict[str, Any]]:
+    """Standalone function to get account summary."""
+    client = _get_client()
+    return client.get_account_summary()
+
+
+async def get_open_positions() -> List[Dict[str, Any]]:
+    """Standalone function to get open positions."""
+    client = _get_client()
+    return client.get_open_positions()
+
+
 class OandaClient:
     def __init__(
         self,
@@ -55,7 +78,7 @@ class OandaClient:
         take_profit: Optional[float] = None,
     ) -> Optional[Dict[str, Any]]:
         try:
-            order_data = {
+            order_data: Dict[str, Any] = {
                 "order": {
                     "instrument": instrument,
                     "units": str(units),
