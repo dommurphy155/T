@@ -1,6 +1,6 @@
+import logging
 import os
 import sys
-import logging
 from datetime import datetime
 
 LOGS_DIR = "logs"
@@ -16,8 +16,8 @@ def setup_logger(name: str):
     logger.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter(
-        "[%(asctime)s] [%(levelname)s] - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
-    )
+        "[%(asctime)s] [%(levelname)s] - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S")
 
     file_handler = logging.FileHandler(os.path.join(LOGS_DIR, f"{name}.log"))
     file_handler.setFormatter(formatter)

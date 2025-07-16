@@ -1,10 +1,10 @@
-import asyncio
+from time import time
+
+from logger import log_trade_action
 from oanda_client import OandaClient
 from position_sizer import calculate_position_size
-from logger import log_trade_action
-from state_manager import record_open_trade, get_state, get_account_summary, load_state
-from utils import get_current_spread, get_atr_value, get_signal_hash
-from time import time
+from state_manager import get_account_summary, load_state, record_open_trade
+from utils import get_atr_value, get_current_spread, get_signal_hash
 
 MAX_SPREAD_PIPS = 2.0
 MAX_TRADES_PER_DAY = 10
@@ -13,11 +13,16 @@ MIN_TIME_BETWEEN_TRADES_SEC = 6
 
 trade_locks = {}
 
+
 async def can_trade(instrument: str, state: dict) -> (bool, str):
     if len(state.get("open_trades", [])) >= MAX_GLOBAL_TRADES:
         return False, "Max global trades reached."
 
-    if state.get("daily_trade_count", {}).get(instrument, 0) >= MAX_TRADES_PER_DAY:
+    if state.get(
+            "daily_trade_count",
+            {}).get(
+            instrument,
+            0) >= MAX_TRADES_PER_DAY:
         return False, f"Max trades for {instrument} today."
 
     last_time = state.get("last_trade_time", {}).get(instrument, 0)
@@ -26,7 +31,11 @@ async def can_trade(instrument: str, state: dict) -> (bool, str):
 
     return True, ""
 
-async def execute_trade(signal: dict, account_summary: dict, state: dict) -> str:
+
+async def execute_trade(
+        signal: dict,
+        account_summary: dict,
+        state: dict) -> str:
     instrument = signal["instrument"]
     direction = signal["direction"]
     spread = await get_current_spread(instrument)
@@ -65,7 +74,9 @@ async def execute_trade(signal: dict, account_summary: dict, state: dict) -> str
             return "Order failed: No trade ID returned."
 
         await record_open_trade(trade_id, instrument, direction, size, atr)
-        await log_trade_action(f"Executed {direction.upper()} on {instrument} for {size} units (ATR: {atr:.2f})")
+        await log_trade_action(
+            f"Executed {direction.upper()} on {instrument} for {size} units (ATR: {atr:.2f})"
+        )
 
         return f"Trade executed: {instrument} {direction} x{size}"
     except Exception as e:
@@ -73,9 +84,9 @@ async def execute_trade(signal: dict, account_summary: dict, state: dict) -> str
     finally:
         trade_locks.pop(instrument, None)
 
+
 # ✅ New for Telegram bot: safe one-off manual trade trigger
 async def execute_single_trade(signal: dict) -> str:
     state = load_state()
     account_summary = await get_account_summary()
     return await execute_trade(signal, account_summary, state)
- 

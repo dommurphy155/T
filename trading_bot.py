@@ -1,21 +1,25 @@
 import asyncio
-from instrument_selector import select_instruments
-from strategy import generate_signals
-from trade_executor import execute_trade
-from state_manager import StateManager
-from oanda_client import get_account_summary
-from telegram_bot import send_update
-from logger import log_info
 from datetime import datetime
 from typing import Any
 
+from instrument_selector import select_instruments
+from logger import log_info
+from oanda_client import get_account_summary
+from state_manager import StateManager
+from strategy import generate_signals
+from telegram_bot import send_update
+from trade_executor import execute_trade
+
 SCAN_INTERVAL = 60  # seconds
+
 
 def get_next_trade_time(*args: Any, **kwargs: Any) -> str:
     return "N/A"
 
+
 def get_last_signal_breakdown(*args: Any, **kwargs: Any) -> str:
     return "No breakdown available."
+
 
 async def trading_loop():
     state_manager = StateManager()
@@ -41,7 +45,9 @@ async def trading_loop():
                 await log_info("📭 No signals generated.")
             else:
                 best_signal = signals[0]
-                result = await execute_trade(best_signal, account_summary, state_manager.get_all())
+                result = await execute_trade(
+                    best_signal, account_summary, state_manager.get_all()
+                )
                 await send_update(result)
                 await log_info(result)
 
@@ -52,6 +58,6 @@ async def trading_loop():
 
         await asyncio.sleep(SCAN_INTERVAL)
 
+
 if __name__ == "__main__":
     asyncio.run(trading_loop())
- 

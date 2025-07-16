@@ -1,13 +1,14 @@
 import asyncio
-import aiofiles
 import json
+import logging
 import os
 import shutil
 import time
-import logging
-from typing import Any, Dict
 from datetime import datetime
 from threading import Lock
+from typing import Any, Dict
+
+import aiofiles
 
 STATE_FILE = "trade_state.json"
 BACKUP_DIR = "state_backups"
@@ -15,6 +16,7 @@ MAX_BACKUPS = 12
 
 file_lock = Lock()
 save_lock = asyncio.Lock()
+
 
 class StateManager:
     def __init__(self):
@@ -31,7 +33,8 @@ class StateManager:
             with open(STATE_FILE, "r") as f:
                 json.load(f)
         except Exception as e:
-            logging.error(f"State file corrupted: {e}, backing up and resetting.")
+            logging.error(
+                f"State file corrupted: {e}, backing up and resetting.")
             timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
             corrupted_name = f"corrupted_{timestamp}.json"
             shutil.copy(STATE_FILE, corrupted_name)
@@ -101,21 +104,22 @@ class StateManager:
                 try:
                     os.remove(os.path.join(BACKUP_DIR, old_file))
                 except Exception as e:
-                    logging.error(f"Failed to delete old backup {old_file}: {e}")
+                    logging.error(
+                        f"Failed to delete old backup {old_file}: {e}")
         except Exception as e:
             logging.error(f"Failed to trim backups: {e}")
+
 
 def reset_daily_counters(state: Dict[str, Any]) -> Dict[str, Any]:
     """
     Resets daily counters in the state dictionary for a fresh trading day.
     Adjust keys as per your actual state structure.
     """
-    if 'daily_trades' in state:
-        state['daily_trades'] = 0
-    if 'daily_profit' in state:
-        state['daily_profit'] = 0.0
-    if 'daily_loss' in state:
-        state['daily_loss'] = 0.0
+    if "daily_trades" in state:
+        state["daily_trades"] = 0
+    if "daily_profit" in state:
+        state["daily_profit"] = 0.0
+    if "daily_loss" in state:
+        state["daily_loss"] = 0.0
     # Add more daily counters as needed
     return state
- 

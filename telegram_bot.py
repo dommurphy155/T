@@ -1,33 +1,28 @@
 import asyncio
 import logging
-import os
-import platform
-import psutil
 import time
+
 import aiofiles
-import socket
-from datetime import datetime
+import psutil
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    ContextTypes,
-    MessageHandler,
-    filters
-)
-from trade_executor import execute_trade
-from trade_closer import close_all_trades
-from trading_bot import get_next_trade_time, get_last_signal_breakdown
+from telegram.ext import (Application, CommandHandler, ContextTypes,
+                          MessageHandler, filters)
+
+from config import MAX_COMMANDS_PER_MIN, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
+from oanda_client import get_open_positions
 from state_manager import StateManager
-from oanda_client import get_open_positions, get_account_summary
-from config import TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, MAX_COMMANDS_PER_MIN
+from trade_closer import close_all_trades
+from trade_executor import execute_trade
+from trading_bot import get_last_signal_breakdown, get_next_trade_time
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 async def send_update(*args, **kwargs) -> None:
     pass  # Placeholder for any future broadcast messages
+
 
 class TelegramBot:
     def __init__(self):
@@ -39,17 +34,23 @@ class TelegramBot:
         self.app.add_handler(CommandHandler("closetrades", self.closetrades))
         self.app.add_handler(CommandHandler("diagnostics", self.diagnostics))
         self.app.add_handler(CommandHandler("whatyoudoin", self.whatyoudoin))
-        self.app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.restrict_chat))
+        self.app.add_handler(
+            MessageHandler(filters.TEXT & ~filters.COMMAND, self.restrict_chat)
+        )
 
     def rate_limited(self):
         now = time.time()
-        self.command_timestamps = [t for t in self.command_timestamps if now - t < 60]
+        self.command_timestamps = [
+            t for t in self.command_timestamps if now - t < 60]
         if len(self.command_timestamps) >= MAX_COMMANDS_PER_MIN:
             return True
         self.command_timestamps.append(now)
         return False
 
-    async def restrict_chat(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def restrict_chat(
+            self,
+            update: Update,
+            context: ContextTypes.DEFAULT_TYPE):
         chat = update.effective_chat
         if chat is None or str(chat.id) != TELEGRAM_CHAT_ID:
             if update.message:
@@ -105,7 +106,10 @@ class TelegramBot:
         )
         await update.message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
 
-    async def maketrade(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def maketrade(
+            self,
+            update: Update,
+            context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
         chat = update.effective_chat
@@ -114,9 +118,14 @@ class TelegramBot:
         if update.message is None:
             return
         result = await execute_trade()
-        await update.message.reply_text(f"📈 Manual Trade: `{result}`", parse_mode=ParseMode.MARKDOWN)
+        await update.message.reply_text(
+            f"📈 Manual Trade: `{result}`", parse_mode=ParseMode.MARKDOWN
+        )
 
-    async def closetrades(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def closetrades(
+            self,
+            update: Update,
+            context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
         chat = update.effective_chat
@@ -125,9 +134,14 @@ class TelegramBot:
         if update.message is None:
             return
         result = await close_all_trades()
-        await update.message.reply_text(f"❌ Closed Trades: `{result}`", parse_mode=ParseMode.MARKDOWN)
+        await update.message.reply_text(
+            f"❌ Closed Trades: `{result}`", parse_mode=ParseMode.MARKDOWN
+        )
 
-    async def diagnostics(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def diagnostics(
+            self,
+            update: Update,
+            context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
         chat = update.effective_chat
@@ -136,9 +150,15 @@ class TelegramBot:
         if update.message is None:
             return
         diagnostics_text = await self.get_last_errors()
-        await update.message.reply_text(f"🛠️ *Diagnostics*\n```\n{diagnostics_text}\n```", parse_mode=ParseMode.MARKDOWN)
+        await update.message.reply_text(
+            f"🛠️ *Diagnostics*\n```\n{diagnostics_text}\n```",
+            parse_mode=ParseMode.MARKDOWN,
+        )
 
-    async def whatyoudoin(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def whatyoudoin(
+            self,
+            update: Update,
+            context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
         chat = update.effective_chat
@@ -147,7 +167,10 @@ class TelegramBot:
         if update.message is None:
             return
         breakdown = get_last_signal_breakdown()
-        await update.message.reply_text(f"🤖 *Decision Breakdown*\n```\n{breakdown}\n```", parse_mode=ParseMode.MARKDOWN)
+        await update.message.reply_text(
+            f"🤖 *Decision Breakdown*\n```\n{breakdown}\n```",
+            parse_mode=ParseMode.MARKDOWN,
+        )
 
     async def ping_latency(self):
         try:
@@ -166,4 +189,3 @@ class TelegramBot:
             return "".join(lines[-10:]) if lines else "No recent errors."
         except FileNotFoundError:
             return "Error log not found."
- 
