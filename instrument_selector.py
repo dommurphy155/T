@@ -1,3 +1,4 @@
+from typing import List
 import random
 import logging
 from datetime import datetime
@@ -8,11 +9,11 @@ CURRENCY_PAIRS = [
 ]
 
 LOW_LIQUIDITY_HOURS = {
-    "start": 21,  # 9 PM UTC (Asia session overlap)
-    "end": 23     # 11 PM UTC (lowest liquidity)
+    "start": 21,
+    "end": 23
 }
 
-def is_active_session_now():
+def is_active_session_now() -> bool:
     utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
     hour = utc_now.hour
     return (
@@ -21,10 +22,10 @@ def is_active_session_now():
         (0 <= hour < 9)
     )
 
-def is_low_liquidity_period():
+def is_low_liquidity_period() -> bool:
     hour = datetime.utcnow().hour
     return LOW_LIQUIDITY_HOURS["start"] <= hour <= LOW_LIQUIDITY_HOURS["end"]
 
-def select_instruments():
-    # Minimal stub for compatibility
+async def select_instruments() -> List[str]:
+    # Stub: Replace with real instrument selection logic
     return CURRENCY_PAIRS
