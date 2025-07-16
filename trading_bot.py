@@ -8,8 +8,17 @@ from telegram_bot import send_update
 from logger import log_info
 from datetime import datetime
 import time
+from typing import Any
 
 SCAN_INTERVAL = 60  # seconds
+
+def get_next_trade_time(*args: Any, **kwargs: Any) -> str:
+    # Stub: Replace with real next trade time logic
+    return "N/A"
+
+def get_last_signal_breakdown(*args: Any, **kwargs: Any) -> str:
+    # Stub: Replace with real signal breakdown logic
+    return "No breakdown available."
 
 async def trading_loop():
     state = await load_state()
