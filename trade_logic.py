@@ -1,125 +1,91 @@
 import pandas as pd
 import numpy as np
-from ta.momentum import RSIIndicator, StochasticOscillator
-from ta.trend import MACD, EMAIndicator
-from ta.volatility import AverageTrueRange
-from datetime import datetime, timedelta
-import pytz
 
-SIGNAL_MEMORY = {}
-SIGNAL_COOLDOWN_SECONDS = 6
-SIGNAL_THRESHOLD = 0.7
+RSI_PERIOD = 14
+EMA_FAST = 12
+EMA_SLOW = 26
+MACD_SIGNAL = 9
 
-def _recent_signal_memory(pair):
-    now = datetime.utcnow()
-    if pair in SIGNAL_MEMORY:
-        last_signal_time = SIGNAL_MEMORY[pair]
-        return (now - last_signal_time).total_seconds() < SIGNAL_COOLDOWN_SECONDS
-    return False
-
-def _update_signal_memory(pair):
-    SIGNAL_MEMORY[pair] = datetime.utcnow()
-
-def compute_indicators(df):
+def calculate_indicators(df):
     df = df.copy()
-    df['rsi'] = RSIIndicator(close=df['close'], window=14).rsi()
-    df['macd'] = MACD(close=df['close']).macd_diff()
-    df['ema9'] = EMAIndicator(close=df['close'], window=9).ema_indicator()
-    df['ema21'] = EMAIndicator(close=df['close'], window=21).ema_indicator()
-    df['atr'] = AverageTrueRange(high=df['high'], low=df['low'], close=df['close']).average_true_range()
-    df['momentum'] = df['close'].diff()
-    df['velocity'] = df['momentum'].diff()
+
+    df['ema_fast'] = df['close'].ewm(span=EMA_FAST, adjust=False).mean()
+    df['ema_slow'] = df['close'].ewm(span=EMA_SLOW, adjust=False).mean()
+    df['macd'] = df['ema_fast'] - df['ema_slow']
+    df['macd_signal'] = df['macd'].ewm(span=MACD_SIGNAL, adjust=False).mean()
+    df['rsi'] = compute_rsi(df['close'], RSI_PERIOD)
+    df['atr'] = compute_atr(df)
+    df['trend'] = detect_trend(df)
+
     return df
 
-def score_signal(df):
-    latest = df.iloc[-1]
-    score = 0
-    total_weight = 0
+def compute_rsi(series, period):
+    delta = series.diff()
+    gain = np.where(delta > 0, delta, 0)
+    loss = np.where(delta < 0, -delta, 0)
+    gain = pd.Series(gain).rolling(window=period).mean()
+    loss = pd.Series(loss).rolling(window=period).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs))
 
-    # RSI
-    if latest['rsi'] < 30:
-        score += 0.2
-    elif latest['rsi'] > 70:
-        score -= 0.2
-    total_weight += 0.2
+def compute_atr(df, period=14):
+    high_low = df['high'] - df['low']
+    high_close = np.abs(df['high'] - df['close'].shift())
+    low_close = np.abs(df['low'] - df['close'].shift())
+    tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+    atr = tr.rolling(window=period).mean()
+    return atr
 
-    # MACD
-    if latest['macd'] > 0:
-        score += 0.2
-    elif latest['macd'] < 0:
-        score -= 0.2
-    total_weight += 0.2
+def detect_trend(df):
+    if df['ema_fast'].iloc[-1] > df['ema_slow'].iloc[-1]:
+        return "up"
+    elif df['ema_fast'].iloc[-1] < df['ema_slow'].iloc[-1]:
+        return "down"
+    return "sideways"
 
-    # EMA Trend
-    if latest['ema9'] > latest['ema21']:
-        score += 0.2
-    elif latest['ema9'] < latest['ema21']:
-        score -= 0.2
-    total_weight += 0.2
-
-    # Momentum
-    if latest['momentum'] > 0 and latest['velocity'] > 0:
-        score += 0.2
-    elif latest['momentum'] < 0 and latest['velocity'] < 0:
-        score -= 0.2
-    total_weight += 0.2
-
-    # Normalize
-    normalized_score = score / total_weight if total_weight else 0
-    return round(normalized_score, 2)
-
-def get_trade_signal(pair, df, higher_tf_df=None):
-    if _recent_signal_memory(pair):
+def get_trade_signal(pair, df):
+    if df is None or len(df) < 30:
         return None
 
-    df = compute_indicators(df)
-    signal_score = score_signal(df)
+    df = calculate_indicators(df)
+    rsi = df['rsi'].iloc[-1]
+    macd = df['macd'].iloc[-1]
+    macd_signal = df['macd_signal'].iloc[-1]
+    trend = df['trend'].iloc[-1]
+    close_price = df['close'].iloc[-1]
 
-    if signal_score < SIGNAL_THRESHOLD:
-        return None
+    signal = None
+    confidence = 0
 
-    # Confirm with higher timeframe if available
-    if higher_tf_df is not None:
-        higher_tf_df = compute_indicators(higher_tf_df)
-        ht_score = score_signal(higher_tf_df)
-        if ht_score < SIGNAL_THRESHOLD:
-            return None
+    if trend == "up" and macd > macd_signal and rsi < 70:
+        signal = "buy"
+        confidence += 1
+    elif trend == "down" and macd < macd_signal and rsi > 30:
+        signal = "sell"
+        confidence += 1
 
-    direction = "buy" if signal_score > 0 else "sell"
-    _update_signal_memory(pair)
-    return {
-        "pair": pair,
-        "direction": direction,
-        "confidence": signal_score,
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    if rsi > 80 or rsi < 20:
+        confidence -= 0.5
 
-def is_forex_market_open():
-    now = datetime.utcnow().replace(tzinfo=pytz.utc)
+    if signal and confidence >= 0.5:
+        return {
+            "instrument": pair,
+            "direction": signal,
+            "confidence": round(confidence, 2),
+            "price": close_price,
+        }
 
-    # Forex runs Sunday 9pm GMT to Friday 9pm GMT
-    weekday = now.weekday()
-    hour = now.hour
+    return None
 
-    if weekday == 5 or weekday == 6:
-        return False  # Saturday or Sunday
-    if weekday == 4 and hour >= 21:
-        return False  # Friday after 9pm
-    if weekday == 6 and hour < 21:
-        return False  # Sunday before 9pm
-    return True
+def get_top_signal(pairs_with_data):
+    best_signal = None
+    best_score = 0
 
-def within_active_session():
-    now = datetime.utcnow().replace(tzinfo=pytz.utc)
-    london = now.astimezone(pytz.timezone("Europe/London")).hour
-    new_york = now.astimezone(pytz.timezone("America/New_York")).hour
-    tokyo = now.astimezone(pytz.timezone("Asia/Tokyo")).hour
+    for pair, df in pairs_with_data.items():
+        signal = get_trade_signal(pair, df)
+        if signal and signal["confidence"] > best_score:
+            best_signal = signal
+            best_score = signal["confidence"]
 
-    return (
-        7 <= london <= 17 or
-        8 <= new_york <= 16 or
-        1 <= tokyo <= 9
-    )
-
-def can_trade_now():
-    return is_forex_market_open() and within_active_session()
+    return best_signal
+ 

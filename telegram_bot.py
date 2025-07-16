@@ -27,8 +27,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 async def send_update(*args, **kwargs) -> None:
-    # Stub: Replace with real Telegram update logic
-    pass
+    pass  # Placeholder for any future broadcast messages
 
 class TelegramBot:
     def __init__(self):
@@ -51,14 +50,19 @@ class TelegramBot:
         return False
 
     async def restrict_chat(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if str(update.effective_chat.id) != TELEGRAM_CHAT_ID:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="Unauthorized.")
+        chat = update.effective_chat
+        if chat is None or str(chat.id) != TELEGRAM_CHAT_ID:
+            if update.message:
+                await update.message.reply_text("Unauthorized.")
             return
 
     async def status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
-        if str(update.effective_chat.id) != TELEGRAM_CHAT_ID:
+        chat = update.effective_chat
+        if chat is None or str(chat.id) != TELEGRAM_CHAT_ID:
+            return
+        if update.message is None:
             return
         cpu = psutil.cpu_percent()
         ram = psutil.virtual_memory().percent
@@ -78,7 +82,10 @@ class TelegramBot:
     async def report(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
-        if str(update.effective_chat.id) != TELEGRAM_CHAT_ID:
+        chat = update.effective_chat
+        if chat is None or str(chat.id) != TELEGRAM_CHAT_ID:
+            return
+        if update.message is None:
             return
         state_manager = StateManager()
         state_manager.load_state()
@@ -101,23 +108,32 @@ class TelegramBot:
     async def maketrade(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
-        if str(update.effective_chat.id) != TELEGRAM_CHAT_ID:
+        chat = update.effective_chat
+        if chat is None or str(chat.id) != TELEGRAM_CHAT_ID:
             return
-        result = await execute_trade(manual_override=True)
+        if update.message is None:
+            return
+        result = await execute_trade()
         await update.message.reply_text(f"📈 Manual Trade: `{result}`", parse_mode=ParseMode.MARKDOWN)
 
     async def closetrades(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
-        if str(update.effective_chat.id) != TELEGRAM_CHAT_ID:
+        chat = update.effective_chat
+        if chat is None or str(chat.id) != TELEGRAM_CHAT_ID:
             return
-        result = await close_all_trades(manual_override=True)
+        if update.message is None:
+            return
+        result = await close_all_trades()
         await update.message.reply_text(f"❌ Closed Trades: `{result}`", parse_mode=ParseMode.MARKDOWN)
 
     async def diagnostics(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
-        if str(update.effective_chat.id) != TELEGRAM_CHAT_ID:
+        chat = update.effective_chat
+        if chat is None or str(chat.id) != TELEGRAM_CHAT_ID:
+            return
+        if update.message is None:
             return
         diagnostics_text = await self.get_last_errors()
         await update.message.reply_text(f"🛠️ *Diagnostics*\n```\n{diagnostics_text}\n```", parse_mode=ParseMode.MARKDOWN)
@@ -125,7 +141,10 @@ class TelegramBot:
     async def whatyoudoin(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         if self.rate_limited():
             return
-        if str(update.effective_chat.id) != TELEGRAM_CHAT_ID:
+        chat = update.effective_chat
+        if chat is None or str(chat.id) != TELEGRAM_CHAT_ID:
+            return
+        if update.message is None:
             return
         breakdown = get_last_signal_breakdown()
         await update.message.reply_text(f"🤖 *Decision Breakdown*\n```\n{breakdown}\n```", parse_mode=ParseMode.MARKDOWN)
@@ -147,3 +166,4 @@ class TelegramBot:
             return "".join(lines[-10:]) if lines else "No recent errors."
         except FileNotFoundError:
             return "Error log not found."
+ 
