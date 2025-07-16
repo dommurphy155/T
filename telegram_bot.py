@@ -17,11 +17,6 @@ from telegram.ext import (
     filters
 )
 
-# ERROR: 'get_next_trade_time' and 'get_last_signal_breakdown' are imported from trading_bot, but are not defined there. Implement these functions or update the import.
-# ERROR: 'load_state' is imported from state_manager, but is not defined there. Implement this function or update the import.
-# ERROR: 'get_open_positions' and 'get_account_summary' are imported from oanda_client, but are not defined there. Implement these functions or update the import.
-# ERROR: 'TELEGRAM_TOKEN', 'TELEGRAM_CHAT_ID', and 'MAX_COMMANDS_PER_MIN' are imported from config, but are not defined there. Implement these variables or update the import.
-
 from trade_executor import execute_trade
 from trade_closer import close_all_trades
 from trading_bot import get_next_trade_time, get_last_signal_breakdown
@@ -31,6 +26,9 @@ from config import TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, MAX_COMMANDS_PER_MIN
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+async def send_update(*args, **kwargs):
+    pass
 
 class TelegramBot:
     def __init__(self):

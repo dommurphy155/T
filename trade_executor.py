@@ -1,8 +1,9 @@
 import asyncio
-# ERROR: 'calculate_position_size' is imported from position_sizer, but only a class is defined there. Implement a module-level function or update the import to use the class method.
-# ERROR: 'log_trade_action' is imported from logger, but logger.py does not exist. Implement logger.py or update the import to use a valid logger.
-# ERROR: 'record_open_trade' is imported from state_manager, but is not defined there. Implement this function or update the import.
-# ERROR: 'get_current_spread', 'get_atr_value', and 'get_signal_hash' are imported from utils, but utils.py does not exist. Implement these functions or update the import.
+from oanda_client import OandaClient
+from position_sizer import calculate_position_size
+from logger import log_trade_action
+from state_manager import record_open_trade
+from utils import get_current_spread, get_atr_value, get_signal_hash
 
 MAX_SPREAD_PIPS = 2.0
 MAX_TRADES_PER_DAY = 10

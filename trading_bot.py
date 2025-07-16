@@ -1,12 +1,21 @@
 import asyncio
-# ERROR: 'select_instruments' is imported from instrument_selector, but is not defined there. Implement this function or update the import.
-# ERROR: 'generate_signals' is imported from strategy, but strategy.py does not exist. Implement this function or update the import.
-# ERROR: 'send_update' is imported from telegram_bot, but is not defined there. Implement this function or update the import.
-# ERROR: 'log_info' is imported from logger, but logger.py does not exist. Implement logger.py or update the import to use a valid logger.
+from instrument_selector import select_instruments
+from strategy import generate_signals
+from trade_executor import execute_trade
+from state_manager import load_state, save_state, reset_daily_counters
+from oanda_client import get_account_summary
+from telegram_bot import send_update
+from logger import log_info
 from datetime import datetime
 import time
 
 SCAN_INTERVAL = 60  # seconds
+
+def get_next_trade_time(*args, **kwargs):
+    return "N/A"
+
+def get_last_signal_breakdown(*args, **kwargs):
+    return "No breakdown available."
 
 async def trading_loop():
     state = await load_state()

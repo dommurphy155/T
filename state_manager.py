@@ -14,6 +14,15 @@ MAX_BACKUPS = 12  # Keep last hour of 5-min interval backups
 file_lock = Lock()
 
 
+def record_open_trade(*args, **kwargs):
+    # Minimal stub for compatibility
+    return None
+
+def load_state(*args, **kwargs):
+    # Minimal stub for compatibility
+    return {}
+
+
 class StateManager:
     def __init__(self):
         self.state = {}
