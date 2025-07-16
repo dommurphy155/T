@@ -1,5 +1,5 @@
 import asyncio
-from oanda_client import place_order
+from oanda_client import OandaClient
 from position_sizer import calculate_position_size
 from logger import log_trade_action
 from state_manager import record_open_trade
@@ -45,6 +45,7 @@ async def execute_trade(signal, account_summary, state):
         return f"Trade already in progress for {instrument}."
 
     trade_locks[instrument] = True
+    client = OandaClient()
 
     try:
         signal_hash = get_signal_hash(signal)
@@ -52,7 +53,7 @@ async def execute_trade(signal, account_summary, state):
             return f"Duplicate signal skipped for {instrument}."
 
         size = await calculate_position_size(instrument, account_summary, atr)
-        order_result = await place_order(instrument, direction, size)
+        order_result = client.place_order(instrument, size if direction == "buy" else -size)
 
         if order_result.get("errorMessage"):
             return f"Order failed: {order_result['errorMessage']}"
