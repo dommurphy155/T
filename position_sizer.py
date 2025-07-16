@@ -1,3 +1,5 @@
+# ERROR: 'calculate_position_size' is imported as a module-level function in other files, but only a class method is defined here. Implement a module-level function or update the import in other files to use the class method.
+
 class PositionSizer:
     def __init__(self, risk_percentage: float, account_balance: float):
         """

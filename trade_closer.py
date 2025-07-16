@@ -1,6 +1,6 @@
 import asyncio
-from oanda_client import close_trade_by_id, get_open_positions
-from logger import log_trade_action
+# ERROR: 'close_trade_by_id' and 'get_open_positions' are imported from oanda_client, but are not defined there. Implement these functions in oanda_client.py or update the import to use the correct class/method.
+# ERROR: 'log_trade_action' is imported from logger, but logger.py does not exist. Implement logger.py or update the import to use a valid logger.
 
 async def close_all_trades(manual_override=False):
     open_positions = await get_open_positions()

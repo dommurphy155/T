@@ -5,6 +5,8 @@ import oandapyV20.endpoints.positions as positions
 import oandapyV20.endpoints.trades as trades
 import logging
 
+# ERROR: 'close_trade_by_id', 'get_open_positions', and 'get_account_summary' are used as module-level functions in other files, but are not defined here. Implement these as module-level functions or update the imports in other files to use the OandaClient class methods.
+
 class OandaClient:
     def __init__(self, access_token: str, account_id: str, environment: str = "practice"):
         self.client = oandapyV20.API(access_token=access_token, environment=environment)
