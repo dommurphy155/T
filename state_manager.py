@@ -95,3 +95,19 @@ class StateManager:
                 os.remove(os.path.join(BACKUP_DIR, old_file))
             except Exception:
                 continue
+
+
+def reset_daily_counters(state: dict) -> dict:
+    """
+    Resets daily counters in the state dictionary for a fresh trading day.
+    Adjust keys as per your actual state structure.
+    """
+    if 'daily_trades' in state:
+        state['daily_trades'] = 0
+    if 'daily_profit' in state:
+        state['daily_profit'] = 0.0
+    if 'daily_loss' in state:
+        state['daily_loss'] = 0.0
+    # Add more daily counters as needed
+    return state
+ 
