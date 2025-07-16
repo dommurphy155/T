@@ -19,7 +19,7 @@ from telegram.ext import (
 from trade_executor import execute_trade
 from trade_closer import close_all_trades
 from trading_bot import get_next_trade_time, get_last_signal_breakdown
-from state_manager import load_state
+from state_manager import StateManager
 from oanda_client import get_open_positions, get_account_summary
 from config import TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, MAX_COMMANDS_PER_MIN
 
@@ -80,7 +80,9 @@ class TelegramBot:
             return
         if str(update.effective_chat.id) != TELEGRAM_CHAT_ID:
             return
-        state = await load_state()
+        state_manager = StateManager()
+        state_manager.load_state()
+        state = state_manager.get_all()
         positions = await get_open_positions()
         pnl = state.get("total_profit_loss", 0)
         wins = state.get("win_count", 0)
