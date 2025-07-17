@@ -10,8 +10,10 @@ from telegram_bot import TelegramBot
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.FileHandler("bot_error.log"),
-              logging.StreamHandler(sys.stdout)],
+    handlers=[
+        logging.FileHandler("bot_error.log"),
+        logging.StreamHandler(sys.stdout),
+    ],
 )
 
 # Global cancellation flag
@@ -20,7 +22,8 @@ shutdown_event = asyncio.Event()
 
 def handle_shutdown(signame):
     logging.warning(
-        f"Received shutdown signal: {signame}. Stopping gracefully...")
+        f"Received shutdown signal: {signame}. Stopping gracefully..."
+    )
     shutdown_event.set()
 
 
@@ -49,6 +52,7 @@ async def main():
 if __name__ == "__main__":
     nest_asyncio.apply()
     for signame in {"SIGINT", "SIGTERM"}:
-        signal.signal(getattr(signal, signame), lambda s,
-                      f: handle_shutdown(signame))
+        signal.signal(
+            getattr(signal, signame), lambda s, f: handle_shutdown(signame)
+        )
     asyncio.run(main())

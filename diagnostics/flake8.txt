@@ -1,0 +1,61 @@
+./bot_runner.py:20:1: E302 expected 2 blank lines, found 1
+./bot_runner.py:24:1: E302 expected 2 blank lines, found 1
+./instrument_selector.py:2:1: F401 'random' imported but unused
+./instrument_selector.py:3:1: F401 'logging' imported but unused
+./instrument_selector.py:16:1: E302 expected 2 blank lines, found 1
+./instrument_selector.py:25:1: E302 expected 2 blank lines, found 1
+./instrument_selector.py:29:1: E302 expected 2 blank lines, found 1
+./logger.py:3:1: E302 expected 2 blank lines, found 1
+./logger.py:7:1: E302 expected 2 blank lines, found 1
+./logger.py:9:9: W292 no newline at end of file
+./oanda_client.py:8:1: F401 'asyncio' imported but unused
+./oanda_client.py:10:1: E302 expected 2 blank lines, found 1
+./oanda_client.py:14:1: E302 expected 2 blank lines, found 1
+./oanda_client.py:18:1: E302 expected 2 blank lines, found 1
+./oanda_client.py:22:1: E302 expected 2 blank lines, found 1
+./oanda_client.py:54:121: E501 line too long (183 > 120 characters)
+./position_sizer.py:1:1: F401 'typing.Any' imported but unused
+./position_sizer.py:2:1: F401 'asyncio' imported but unused
+./position_sizer.py:4:1: E302 expected 2 blank lines, found 1
+./position_sizer.py:8:1: E302 expected 2 blank lines, found 1
+./position_sizer.py:13:121: E501 line too long (130 > 120 characters)
+./state_manager.py:11:1: E302 expected 2 blank lines, found 1
+./state_manager.py:15:1: E302 expected 2 blank lines, found 1
+./state_manager.py:24:1: E302 expected 2 blank lines, found 1
+./state_manager.py:120:1: W293 blank line contains whitespace
+./state_manager.py:120:2: W292 no newline at end of file
+./strategy.py:3:1: E302 expected 2 blank lines, found 1
+./strategy.py:5:14: W292 no newline at end of file
+./telegram_bot.py:3:1: F401 'os' imported but unused
+./telegram_bot.py:4:1: F401 'platform' imported but unused
+./telegram_bot.py:8:1: F401 'socket' imported but unused
+./telegram_bot.py:9:1: F401 'datetime.datetime' imported but unused
+./telegram_bot.py:23:1: F401 'oanda_client.get_account_summary' imported but unused
+./telegram_bot.py:29:1: E302 expected 2 blank lines, found 1
+./telegram_bot.py:33:1: E302 expected 2 blank lines, found 1
+./telegram_bot.py:123:121: E501 line too long (121 > 120 characters)
+./trade_closer.py:5:1: E302 expected 2 blank lines, found 1
+./trade_executor.py:1:1: F401 'asyncio' imported but unused
+./trade_executor.py:15:1: E302 expected 2 blank lines, found 1
+./trade_executor.py:31:1: E302 expected 2 blank lines, found 1
+./trade_logic.py:1:1: F401 'pandas as pd' imported but unused
+./trade_logic.py:2:1: F401 'numpy as np' imported but unused
+./trade_logic.py:3:1: F401 'ta.momentum.StochasticOscillator' imported but unused
+./trade_logic.py:6:1: F401 'datetime.timedelta' imported but unused
+./trade_logic.py:13:1: E302 expected 2 blank lines, found 1
+./trade_logic.py:20:1: E302 expected 2 blank lines, found 1
+./trade_logic.py:23:1: E302 expected 2 blank lines, found 1
+./trade_logic.py:34:1: E302 expected 2 blank lines, found 1
+./trade_logic.py:71:1: E302 expected 2 blank lines, found 1
+./trade_logic.py:97:1: E302 expected 2 blank lines, found 1
+./trade_logic.py:112:1: E302 expected 2 blank lines, found 1
+./trade_logic.py:124:1: E302 expected 2 blank lines, found 1
+./trading_bot.py:10:1: F401 'time' imported but unused
+./trading_bot.py:15:1: E302 expected 2 blank lines, found 1
+./trading_bot.py:19:1: E302 expected 2 blank lines, found 1
+./trading_bot.py:23:1: E302 expected 2 blank lines, found 1
+./trading_bot.py:60:1: E302 expected 2 blank lines, found 1
+./utils.py:3:1: E302 expected 2 blank lines, found 1
+./utils.py:7:1: E302 expected 2 blank lines, found 1
+./utils.py:11:1: E302 expected 2 blank lines, found 1
+./utils.py:13:24: W292 no newline at end of file

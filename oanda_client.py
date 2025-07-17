@@ -16,7 +16,8 @@ class OandaClient:
         environment: str = "practice",
     ):
         self.client = oandapyV20.API(
-            access_token=access_token, environment=environment)
+            access_token=access_token, environment=environment
+        )
         self.account_id = account_id
 
     def get_account_summary(self) -> Optional[Dict[str, Any]]:
@@ -65,10 +66,12 @@ class OandaClient:
             }
             if stop_loss is not None:
                 order_data["order"]["stopLossOnFill"] = {
-                    "price": str(stop_loss)}
+                    "price": str(stop_loss)
+                }
             if take_profit is not None:
                 order_data["order"]["takeProfitOnFill"] = {
-                    "price": str(take_profit)}
+                    "price": str(take_profit)
+                }
             r = orders.OrderCreate(accountID=self.account_id, data=order_data)
             self.client.request(r)
             return r.response

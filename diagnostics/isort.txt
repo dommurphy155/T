@@ -1,0 +1,238 @@
+ERROR: /home/ubuntu/this-is-annoying/trading_bot.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/logger.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/trade_closer.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/oanda_client.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/instrument_selector.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/strategy.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/utils.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/telegram_bot.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/trade_logic.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/config.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/position_sizer.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/state_manager.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/bot_runner.py Imports are incorrectly sorted and/or formatted.
+ERROR: /home/ubuntu/this-is-annoying/trade_executor.py Imports are incorrectly sorted and/or formatted.
+--- /home/ubuntu/this-is-annoying/trading_bot.py:before	2025-07-16 20:42:36.363413
++++ /home/ubuntu/this-is-annoying/trading_bot.py:after	2025-07-16 21:02:53.765769
+@@ -1,14 +1,15 @@
+ import asyncio
++import time
++from datetime import datetime
++from typing import Any
++
+ from instrument_selector import select_instruments
++from logger import log_info
++from oanda_client import get_account_summary
++from state_manager import StateManager
+ from strategy import generate_signals
++from telegram_bot import send_update
+ from trade_executor import execute_trade
+-from state_manager import StateManager
+-from oanda_client import get_account_summary
+-from telegram_bot import send_update
+-from logger import log_info
+-from datetime import datetime
+-import time
+-from typing import Any
+ 
+ SCAN_INTERVAL = 60  # seconds
+ 
+--- /home/ubuntu/this-is-annoying/logger.py:before	2025-07-16 20:37:24.585421
++++ /home/ubuntu/this-is-annoying/logger.py:after	2025-07-16 21:02:53.766806
+@@ -1,4 +1,5 @@
+ from typing import Any
++
+ 
+ async def log_trade_action(*args: Any, **kwargs: Any) -> None:
+     # Stub: Replace with real logging logic
+--- /home/ubuntu/this-is-annoying/trade_closer.py:before	2025-07-16 20:37:24.589421
++++ /home/ubuntu/this-is-annoying/trade_closer.py:after	2025-07-16 21:02:53.768349
+@@ -1,6 +1,8 @@
+ import asyncio
++
++from logger import log_trade_action
+ from oanda_client import close_trade_by_id, get_open_positions
+-from logger import log_trade_action
++
+ 
+ async def close_all_trades(manual_override=False):
+     open_positions = await get_open_positions()
+--- /home/ubuntu/this-is-annoying/oanda_client.py:before	2025-07-16 20:37:24.589421
++++ /home/ubuntu/this-is-annoying/oanda_client.py:after	2025-07-16 21:02:53.773685
+@@ -1,11 +1,13 @@
++import asyncio
++import logging
++from typing import Any, Dict, List, Optional
++
+ import oandapyV20
+ import oandapyV20.endpoints.accounts as accounts
+ import oandapyV20.endpoints.orders as orders
+ import oandapyV20.endpoints.positions as positions
+ import oandapyV20.endpoints.trades as trades
+-import logging
+-from typing import Any, Dict, List, Optional
+-import asyncio
++
+ 
+ async def close_trade_by_id(trade_id: str) -> Dict[str, Any]:
+     # Stub: Replace with real OANDA trade close logic
+--- /home/ubuntu/this-is-annoying/instrument_selector.py:before	2025-07-16 20:37:24.585421
++++ /home/ubuntu/this-is-annoying/instrument_selector.py:after	2025-07-16 21:02:53.776342
+@@ -1,7 +1,8 @@
++import logging
++import random
++from datetime import datetime
+ from typing import List
+-import random
+-import logging
+-from datetime import datetime
++
+ import pytz
+ 
+ CURRENCY_PAIRS = [
+--- /home/ubuntu/this-is-annoying/strategy.py:before	2025-07-16 20:37:24.589421
++++ /home/ubuntu/this-is-annoying/strategy.py:after	2025-07-16 21:02:53.853257
+@@ -1,4 +1,5 @@
+ from typing import Any, List
++
+ 
+ async def generate_signals(*args: Any, **kwargs: Any) -> List[Any]:
+     # Stub: Replace with real signal generation logic
+--- /home/ubuntu/this-is-annoying/utils.py:before	2025-07-16 20:37:24.589421
++++ /home/ubuntu/this-is-annoying/utils.py:after	2025-07-16 21:02:53.854170
+@@ -1,4 +1,5 @@
+ from typing import Any
++
+ 
+ async def get_current_spread(*args: Any, **kwargs: Any) -> float:
+     # Stub: Replace with real spread fetching logic
+--- /home/ubuntu/this-is-annoying/telegram_bot.py:before	2025-07-16 20:42:36.363413
++++ /home/ubuntu/this-is-annoying/telegram_bot.py:after	2025-07-16 21:02:54.054227
+@@ -2,26 +2,23 @@
+ import logging
+ import os
+ import platform
++import socket
++import time
++from datetime import datetime
++
++import aiofiles
+ import psutil
+-import time
+-import aiofiles
+-import socket
+-from datetime import datetime
+ from telegram import Update
+ from telegram.constants import ParseMode
+-from telegram.ext import (
+-    Application,
+-    CommandHandler,
+-    ContextTypes,
+-    MessageHandler,
+-    filters
+-)
++from telegram.ext import (Application, CommandHandler, ContextTypes,
++                          MessageHandler, filters)
++
++from config import MAX_COMMANDS_PER_MIN, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
++from oanda_client import get_account_summary, get_open_positions
++from state_manager import StateManager
++from trade_closer import close_all_trades
+ from trade_executor import execute_trade
+-from trade_closer import close_all_trades
+-from trading_bot import get_next_trade_time, get_last_signal_breakdown
+-from state_manager import StateManager
+-from oanda_client import get_open_positions, get_account_summary
+-from config import TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, MAX_COMMANDS_PER_MIN
++from trading_bot import get_last_signal_breakdown, get_next_trade_time
+ 
+ logging.basicConfig(level=logging.INFO)
+ logger = logging.getLogger(__name__)
+--- /home/ubuntu/this-is-annoying/trade_logic.py:before	2025-07-16 20:37:24.589421
++++ /home/ubuntu/this-is-annoying/trade_logic.py:after	2025-07-16 21:02:54.060203
+@@ -1,10 +1,11 @@
++from datetime import datetime, timedelta
++
++import numpy as np
+ import pandas as pd
+-import numpy as np
++import pytz
+ from ta.momentum import RSIIndicator, StochasticOscillator
+ from ta.trend import MACD, EMAIndicator
+ from ta.volatility import AverageTrueRange
+-from datetime import datetime, timedelta
+-import pytz
+ 
+ SIGNAL_MEMORY = {}
+ SIGNAL_COOLDOWN_SECONDS = 6
+--- /home/ubuntu/this-is-annoying/config.py:before	2025-07-16 20:37:24.585421
++++ /home/ubuntu/this-is-annoying/config.py:after	2025-07-16 21:02:54.062311
+@@ -1,6 +1,6 @@
++import logging
+ import os
+ import sys
+-import logging
+ from datetime import datetime
+ 
+ LOGS_DIR = "logs"
+--- /home/ubuntu/this-is-annoying/position_sizer.py:before	2025-07-16 20:37:24.589421
++++ /home/ubuntu/this-is-annoying/position_sizer.py:after	2025-07-16 21:02:54.063461
+@@ -1,5 +1,6 @@
++import asyncio
+ from typing import Any
+-import asyncio
++
+ 
+ async def calculate_position_size(*args, **kwargs) -> int:
+     # Stub: Replace with real position sizing logic
+--- /home/ubuntu/this-is-annoying/state_manager.py:before	2025-07-16 20:37:26.257454
++++ /home/ubuntu/this-is-annoying/state_manager.py:after	2025-07-16 21:02:54.066604
+@@ -1,12 +1,14 @@
+-from typing import Any, Dict
++import asyncio
+ import json
+ import os
++import shutil
+ import time
+-import shutil
++from datetime import datetime
++from threading import Lock
++from typing import Any, Dict
++
+ import aiofiles
+-import asyncio
+-from threading import Lock
+-from datetime import datetime
++
+ 
+ async def record_open_trade(*args, **kwargs) -> None:
+     # Stub: Replace with real trade recording logic
+--- /home/ubuntu/this-is-annoying/bot_runner.py:before	2025-07-16 20:37:24.585421
++++ /home/ubuntu/this-is-annoying/bot_runner.py:after	2025-07-16 21:02:54.069354
+@@ -1,8 +1,10 @@
+ import asyncio
+ import logging
+-import nest_asyncio
+ import signal
+ import sys
++
++import nest_asyncio
++
+ from telegram_bot import TelegramBot
+ 
+ logging.basicConfig(
+--- /home/ubuntu/this-is-annoying/trade_executor.py:before	2025-07-16 20:37:24.589421
++++ /home/ubuntu/this-is-annoying/trade_executor.py:after	2025-07-16 21:02:54.073658
+@@ -1,9 +1,10 @@
+ import asyncio
++
++from logger import log_trade_action
+ from oanda_client import OandaClient
+ from position_sizer import calculate_position_size
+-from logger import log_trade_action
+ from state_manager import record_open_trade
+-from utils import get_current_spread, get_atr_value, get_signal_hash
++from utils import get_atr_value, get_current_spread, get_signal_hash
+ 
+ MAX_SPREAD_PIPS = 2.0
+ MAX_TRADES_PER_DAY = 10

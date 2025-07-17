@@ -1,0 +1,34 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/home/ubuntu/this-is-annoying/trading_bot.py", line 7, in <module>
+    from oanda_client import get_account_summary
+ImportError: cannot import name 'get_account_summary' from 'oanda_client' (/home/ubuntu/this-is-annoying/oanda_client.py)
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/home/ubuntu/this-is-annoying/trade_closer.py", line 4, in <module>
+    from oanda_client import close_trade_by_id, get_open_positions
+ImportError: cannot import name 'close_trade_by_id' from 'oanda_client' (/home/ubuntu/this-is-annoying/oanda_client.py)
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named '__init__'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named '__init__'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named '__init__'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/home/ubuntu/this-is-annoying/telegram_bot.py", line 6, in <module>
+    import psutil
+ModuleNotFoundError: No module named 'psutil'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/home/ubuntu/this-is-annoying/bot_runner.py", line 6, in <module>
+    import nest_asyncio
+ModuleNotFoundError: No module named 'nest_asyncio'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/home/ubuntu/this-is-annoying/trade_executor.py", line 6, in <module>
+    from state_manager import get_account_summary, load_state, record_open_trade
+ImportError: cannot import name 'get_account_summary' from 'state_manager' (/home/ubuntu/this-is-annoying/state_manager.py)

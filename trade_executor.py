@@ -18,11 +18,10 @@ async def can_trade(instrument: str, state: dict) -> (bool, str):
     if len(state.get("open_trades", [])) >= MAX_GLOBAL_TRADES:
         return False, "Max global trades reached."
 
-    if state.get(
-            "daily_trade_count",
-            {}).get(
-            instrument,
-            0) >= MAX_TRADES_PER_DAY:
+    if (
+        state.get("daily_trade_count", {}).get(instrument, 0)
+        >= MAX_TRADES_PER_DAY
+    ):
         return False, f"Max trades for {instrument} today."
 
     last_time = state.get("last_trade_time", {}).get(instrument, 0)
@@ -33,9 +32,8 @@ async def can_trade(instrument: str, state: dict) -> (bool, str):
 
 
 async def execute_trade(
-        signal: dict,
-        account_summary: dict,
-        state: dict) -> str:
+    signal: dict, account_summary: dict, state: dict
+) -> str:
     instrument = signal["instrument"]
     direction = signal["direction"]
     spread = await get_current_spread(instrument)

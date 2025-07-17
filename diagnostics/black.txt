@@ -1,0 +1,16 @@
+would reformat instrument_selector.py
+would reformat logger.py
+would reformat bot_runner.py
+would reformat position_sizer.py
+would reformat oanda_client.py
+would reformat strategy.py
+would reformat state_manager.py
+would reformat trade_closer.py
+would reformat trade_executor.py
+would reformat telegram_bot.py
+would reformat trading_bot.py
+would reformat utils.py
+would reformat trade_logic.py
+
+Oh no! 💥 💔 💥
+13 files would be reformatted, 277 files would be left unchanged.

@@ -17,7 +17,8 @@ def setup_logger(name: str):
 
     formatter = logging.Formatter(
         "[%(asctime)s] [%(levelname)s] - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S")
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
     file_handler = logging.FileHandler(os.path.join(LOGS_DIR, f"{name}.log"))
     file_handler.setFormatter(formatter)

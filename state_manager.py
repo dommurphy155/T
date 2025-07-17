@@ -34,7 +34,8 @@ class StateManager:
                 json.load(f)
         except Exception as e:
             logging.error(
-                f"State file corrupted: {e}, backing up and resetting.")
+                f"State file corrupted: {e}, backing up and resetting."
+            )
             timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
             corrupted_name = f"corrupted_{timestamp}.json"
             shutil.copy(STATE_FILE, corrupted_name)
@@ -105,7 +106,8 @@ class StateManager:
                     os.remove(os.path.join(BACKUP_DIR, old_file))
                 except Exception as e:
                     logging.error(
-                        f"Failed to delete old backup {old_file}: {e}")
+                        f"Failed to delete old backup {old_file}: {e}"
+                    )
         except Exception as e:
             logging.error(f"Failed to trim backups: {e}")
 

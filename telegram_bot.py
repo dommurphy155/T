@@ -41,16 +41,16 @@ class TelegramBot:
     def rate_limited(self):
         now = time.time()
         self.command_timestamps = [
-            t for t in self.command_timestamps if now - t < 60]
+            t for t in self.command_timestamps if now - t < 60
+        ]
         if len(self.command_timestamps) >= MAX_COMMANDS_PER_MIN:
             return True
         self.command_timestamps.append(now)
         return False
 
     async def restrict_chat(
-            self,
-            update: Update,
-            context: ContextTypes.DEFAULT_TYPE):
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         chat = update.effective_chat
         if chat is None or str(chat.id) != TELEGRAM_CHAT_ID:
             if update.message:
@@ -107,9 +107,8 @@ class TelegramBot:
         await update.message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
 
     async def maketrade(
-            self,
-            update: Update,
-            context: ContextTypes.DEFAULT_TYPE):
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         if self.rate_limited():
             return
         chat = update.effective_chat
@@ -123,9 +122,8 @@ class TelegramBot:
         )
 
     async def closetrades(
-            self,
-            update: Update,
-            context: ContextTypes.DEFAULT_TYPE):
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         if self.rate_limited():
             return
         chat = update.effective_chat
@@ -139,9 +137,8 @@ class TelegramBot:
         )
 
     async def diagnostics(
-            self,
-            update: Update,
-            context: ContextTypes.DEFAULT_TYPE):
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         if self.rate_limited():
             return
         chat = update.effective_chat
@@ -156,9 +153,8 @@ class TelegramBot:
         )
 
     async def whatyoudoin(
-            self,
-            update: Update,
-            context: ContextTypes.DEFAULT_TYPE):
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         if self.rate_limited():
             return
         chat = update.effective_chat
@@ -175,7 +171,9 @@ class TelegramBot:
     async def ping_latency(self):
         try:
             start = time.time()
-            reader, writer = await asyncio.open_connection("api.telegram.org", 443)
+            reader, writer = await asyncio.open_connection(
+                "api.telegram.org", 443
+            )
             writer.close()
             await writer.wait_closed()
             return (time.time() - start) * 1000
