@@ -116,7 +116,22 @@ class TelegramBot:
             return
         if update.message is None:
             return
-        result = await execute_trade()
+        
+        # Create a simple signal for manual trade
+        signal = {
+            "instrument": "EUR_USD",
+            "direction": "buy",
+            "strength": 1.0
+        }
+        
+        state_manager = StateManager()
+        state_manager.load_state()
+        state = state_manager.get_all()
+        
+        from oanda_client import get_account_summary
+        account_summary = await get_account_summary()
+        
+        result = await execute_trade(signal, account_summary, state)
         await update.message.reply_text(
             f"📈 Manual Trade: `{result}`", parse_mode=ParseMode.MARKDOWN
         )
