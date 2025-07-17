@@ -1,11 +1,12 @@
 import asyncio
 
 from logger import log_trade_action
-from oanda_client import close_trade_by_id, get_open_positions
+from oanda_client import OandaClient
 
 
 async def close_all_trades(manual_override=False):
-    open_positions = await get_open_positions()
+    client = OandaClient()
+    open_positions = client.get_open_positions()
     if not open_positions:
         return "No open positions to close."
 
@@ -15,12 +16,14 @@ async def close_all_trades(manual_override=False):
             units = int(position[side]["units"])
             if units != 0:
                 trade_id = position[side]["tradeIDs"][0]
-                result = await close_trade_by_id(trade_id)
+                result = client.close_trade(trade_id)
                 results.append(
-                    f"Closed {side.upper()} {position['instrument']} - {units} units: {result}"
+                    f"Closed {side.upper()} {position['instrument']} - "
+                    f"{units} units: {result}"
                 )
                 await log_trade_action(
-                    f"Closed trade {trade_id} on {position['instrument']} ({side}) - {result}"
+                    f"Closed trade {trade_id} on {position['instrument']} "
+                    f"({side}) - {result}"
                 )
 
                 # Sleep to respect rate limits
